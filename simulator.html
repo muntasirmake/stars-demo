@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo Simulator — Internal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --accent:#4F5BD5; --accent-hover:#4350C0; --accent-soft:#EEEFFB; --accent-tint:#C7CBF2; --accent-mid:#6E78E0;
+    --bg:#FAFAFB; --bg-sunken:#F5F5F7; --surface:#FFFFFF; --hover:#F4F4F6;
+    --border:#ECECEF; --border-2:#E4E4E8;
+    --text:#1B1C22; --text-2:#5E616E; --text-3:#8A8D99; --text-4:#ADB0BB;
+    --green:#137A4F; --green-bg:#E6F2EC; --green-bd:#C6E4D5;
+    --amber:#936400; --amber-bg:#FAF1DC; --amber-bd:#EFDFB6;
+    --red:#BB453C; --red-bg:#FAEBE9; --red-bd:#F0D2CE;
+    --slate:#5C6373; --slate-bg:#EFF0F3;
+    --r-sm:8px; --r-md:10px; --r-lg:14px; --r-xl:18px; --r-pill:999px;
+    --sh-md:0 6px 16px -6px rgba(24,24,50,.12), 0 2px 6px rgba(24,24,50,.05);
+    --font:'Hanken Grotesk', system-ui, sans-serif;
+    --mono:'JetBrains Mono', monospace;
+  }
+  * { box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+  body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text); font-size:14px; line-height:1.5; letter-spacing:-.005em; }
+
+  /* ── Warning banner ── */
+  .warn-banner {
+    background:repeating-linear-gradient(45deg, #FAF1DC 0, #FAF1DC 12px, #EFDFB6 12px, #EFDFB6 24px);
+    border-bottom:2px solid var(--amber-bd);
+    padding:10px 28px;
+    display:flex; align-items:center; gap:10px;
+    font-size:12px; font-weight:700; letter-spacing:.06em; color:var(--amber); text-transform:uppercase;
+  }
+
+  .container { max-width:700px; margin:0 auto; padding:36px 24px 60px; }
+
+  /* ── Page header ── */
+  .pg-title { font-size:24px; font-weight:700; letter-spacing:-.025em; margin-bottom:5px; }
+  .pg-sub   { font-size:13.5px; color:var(--text-3); line-height:1.55; margin-bottom:28px; }
+
+  /* ── Cards ── */
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-xl); padding:22px 24px; box-shadow:var(--sh-md); margin-bottom:14px; }
+  .card-ttl { font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--text-3); margin-bottom:16px; }
+
+  /* ── State rows ── */
+  .state-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .state-row:last-child { border-bottom:none; padding-bottom:0; }
+  .state-key { font-weight:600; }
+  .state-val { font-family:var(--mono); font-size:12px; }
+  .c-live { color:var(--green); } .c-pending { color:var(--amber); } .c-none { color:var(--text-4); }
+
+  /* ── Flow steps ── */
+  .step { display:flex; gap:13px; align-items:flex-start; padding:13px 0; border-bottom:1px solid var(--border); }
+  .step:last-child { border-bottom:none; padding-bottom:0; }
+  .step-num { width:26px; height:26px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:11px; font-weight:700; background:var(--bg-sunken); border:1.5px solid var(--border); color:var(--text-3); margin-top:2px; }
+  .step-num.done   { background:var(--green); border-color:var(--green); color:#fff; }
+  .step-num.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .step-name { font-size:13.5px; font-weight:600; line-height:1.3; }
+  .step-desc { font-size:12.5px; color:var(--text-3); margin-top:2px; line-height:1.4; }
+
+  /* ── Buttons ── */
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:42px; padding:0 20px; border-radius:var(--r-md); border:none; cursor:pointer; font-family:var(--font); font-size:14px; font-weight:600; letter-spacing:-.01em; transition:background .15s, transform .05s; }
+  .btn:active { transform:scale(.98); }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:var(--accent-hover); }
+  .btn-primary:disabled { background:var(--text-4); cursor:not-allowed; transform:none; opacity:.7; }
+  .btn-danger  { background:var(--red-bg); color:var(--red); border:1px solid var(--red-bd); }
+  .btn-danger:hover { background:#F0D2CE; }
+
+  /* ── Open links ── */
+  .link-card { display:inline-flex; align-items:center; gap:8px; padding:11px 16px; border-radius:var(--r-md); background:var(--surface); border:1px solid var(--border-2); font-family:var(--font); font-size:13.5px; font-weight:600; color:var(--text); text-decoration:none; transition:background .12s; }
+  .link-card:hover { background:var(--hover); }
+
+  /* ── Toast ── */
+  .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:var(--text); color:#fff; padding:12px 22px; border-radius:var(--r-lg); font-size:13.5px; font-weight:600; box-shadow:0 8px 28px rgba(22,22,40,.3); opacity:0; transition:opacity .22s; pointer-events:none; white-space:nowrap; z-index:99; }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<div class="warn-banner">⚠&nbsp;&nbsp;Internal Demo Simulator — Not part of the customer or admin product</div>
+
+<div class="container">
+
+  <div class="pg-title">Demo Simulator</div>
+  <div class="pg-sub">Control shared demo state across the STARS Admin Console and MTB Neo mobile app. Open both in separate browser tabs for the best live demo experience.</div>
+
+  <!-- State panel -->
+  <div class="card">
+    <div class="card-ttl">Live demo state</div>
+    <div class="state-row"><span class="state-key">Console login</span><span class="state-val c-none" id="s-login">—</span></div>
+    <div class="state-row"><span class="state-key">Bill Pay Bonus campaign</span><span class="state-val c-none" id="s-campaign">—</span></div>
+    <div class="state-row"><span class="state-key">Bill Pay Bonus — customer completed</span><span class="state-val c-none" id="s-done">—</span></div>
+    <div class="state-row"><span class="state-key">Bill Pay Booster (existing)</span><span class="state-val c-none" id="s-billpay">—</span></div>
+    <div class="state-row"><span class="state-key">Voucher redeemed</span><span class="state-val c-none" id="s-voucher">—</span></div>
+    <div class="state-row"><span class="state-key">Customer STARS balance</span><span class="state-val" id="s-balance" style="font-size:14px;font-weight:700;">—</span></div>
+  </div>
+
+  <!-- Demo flow -->
+  <div class="card">
+    <div class="card-ttl">Demo flow checklist</div>
+    <div id="flow-steps"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="card">
+    <div class="card-ttl">Simulator controls</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="btn-simulate" onclick="simulateBillPayment()">Simulate Bill Payment</button>
+        <span style="font-size:12.5px;color:var(--text-3);">Marks Bill Pay Bonus as completed · adds +500 STARS to customer balance</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <button class="btn btn-danger" onclick="resetDemo()">Reset All Demo State</button>
+        <span style="font-size:12.5px;color:var(--text-3);">Clears all localStorage keys · resets balance to 18,420 · returns console to login</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Links -->
+  <div class="card" style="margin-bottom:0;">
+    <div class="card-ttl">Open in browser tabs</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:13px;">
+      <a class="link-card" href="admin.html" target="_blank">STARS Admin Console ↗</a>
+      <a class="link-card" href="mobile/app.html" target="_blank">📱 MTB Neo Mobile ↗</a>
+    </div>
+    <div style="font-size:12px;color:var(--text-4);line-height:1.65;">
+      Recommended: open both links above in separate tabs. After clicking "Simulate Bill Payment", switch to each tab to see the state update live. The mobile app polls every 1.5 s — no refresh needed.
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEYS = {
+  login:    'demo_loggedIn',
+  campaign: 'demo_billbonus_status',
+  done:     'demo_billbonus_done',
+  billpay:  'mtb_billpay',
+  voucher:  'mtb_voucher',
+};
+
+const FLOW = [
+  { key:'login',    label:'Admin login',              desc:'Sign in to the STARS Admin Console · kaiser.jahangir@mutualtrustbank.com / MTBdemo@2026' },
+  { key:'created',  label:'Campaign created',          desc:'Open Campaign Builder, create "Bill Pay Bonus" and submit for approval' },
+  { key:'pending',  label:'Submitted for approval',    desc:'Campaign enters approval workflow — status: Pending Approval' },
+  { key:'live',     label:'Campaign approved & live',  desc:'Auto-approved after 5 seconds — now visible on MTB Neo mobile app' },
+  { key:'done',     label:'Bill payment simulated',    desc:'Click "Simulate Bill Payment" above — 500 STARS issued, analytics updated' },
+];
+
+function state() {
+  return {
+    login:    localStorage.getItem(KEYS.login) === 'true',
+    campaign: localStorage.getItem(KEYS.campaign),
+    done:     localStorage.getItem(KEYS.done) === 'true',
+    billpay:  localStorage.getItem(KEYS.billpay) === 'true',
+    voucher:  localStorage.getItem(KEYS.voucher) === 'true',
+  };
+}
+
+function updateUI() {
+  const s = state();
+
+  set('s-login',    s.login    ? '✓ Signed in as Kaiser Jahangir'  : '— Not logged in',       s.login?'c-live':'c-none');
+  const cl = s.campaign==='live' ? 'c-live' : s.campaign==='pending' ? 'c-pending' : 'c-none';
+  set('s-campaign', s.campaign==='live' ? '✓ Live' : s.campaign==='pending' ? '⏳ Pending approval' : '— Not created', cl);
+  set('s-done',     s.done     ? '✓ Completed — 500 STARS issued'   : '— Not yet',             s.done?'c-live':'c-none');
+  set('s-billpay',  s.billpay  ? '✓ Completed (+250 STARS)'         : '— 2 of 3 payments',     s.billpay?'c-live':'c-none');
+  set('s-voucher',  s.voucher  ? '✓ Redeemed (−1,000 STARS)'        : '— Not redeemed',        s.voucher?'c-pending':'c-none');
+
+  let bal = 18420 + (s.billpay?250:0) - (s.voucher?1000:0) + (s.done?500:0);
+  const bEl = document.getElementById('s-balance');
+  bEl.textContent = bal.toLocaleString('en-US') + ' STARS';
+  bEl.className = 'state-val';
+
+  // Flow checklist
+  const stepStates = {
+    login:   s.login,
+    created: !!s.campaign,
+    pending: !!s.campaign,
+    live:    s.campaign === 'live',
+    done:    s.done,
+  };
+  document.getElementById('flow-steps').innerHTML = FLOW.map((f,i) => {
+    const done = stepStates[f.key];
+    const prev = i === 0 || stepStates[FLOW[i-1].key];
+    const cls  = done ? 'done' : (prev && !done) ? 'active' : '';
+    return `<div class="step"><div class="step-num ${cls}">${done?'✓':i+1}</div><div><div class="step-name">${f.label}</div><div class="step-desc">${f.desc}</div></div></div>`;
+  }).join('');
+
+  // Simulate button
+  const canSim = s.campaign === 'live' && !s.done;
+  const btn = document.getElementById('btn-simulate');
+  btn.disabled = !canSim;
+  btn.title = !s.campaign ? 'Create the campaign in the admin console first'
+    : s.campaign === 'pending' ? 'Waiting for approval (5 seconds)…'
+    : s.done ? 'Already completed' : '';
+}
+
+function set(id, text, cls) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'state-val' + (cls ? ' ' + cls : '');
+}
+
+function simulateBillPayment() {
+  const s = state();
+  if (s.campaign !== 'live') { toast('Campaign must be Live first. Create it in the admin console.'); return; }
+  if (s.done) { toast('Already simulated.'); return; }
+  localStorage.setItem(KEYS.done, 'true');
+  updateUI();
+  toast('✓ Bill payment simulated — 500 STARS issued to Kaiser Jahangir');
+}
+
+function resetDemo() {
+  Object.values(KEYS).forEach(k => localStorage.removeItem(k));
+  localStorage.removeItem('mtb_tab');
+  // Broadcast reset to other tabs
+  localStorage.setItem('demo_reset', Date.now().toString());
+  setTimeout(() => localStorage.removeItem('demo_reset'), 200);
+  updateUI();
+  toast('Demo state reset. All tabs will return to their initial state.');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+updateUI();
+window.addEventListener('storage', updateUI);
+setInterval(updateUI, 1000);
+</script>
+</body>
+</html>

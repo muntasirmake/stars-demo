@@ -1,0 +1,9 @@
+{
+  "name": "stars-mtb-demo",
+  "version": "1.0.0",
+  "description": "STARS × MTB Neo Loyalty Demo — static site",
+  "scripts": {
+    "dev":   "npx http-server . -p 3000 --cors -o /index.html",
+    "start": "npx http-server . -p 3000 --cors -o /index.html"
+  }
+}

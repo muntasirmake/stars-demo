@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTB · Mobile Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;450;500;600;700;800&display=swap">
+<style>
+  :root {
+    --accent:#5A62B0; --accent-press:#4A5199; --accent-soft:#EFF0F7; --accent-tint:#CDD0E6;
+    --ink:#1B1C22; --ink-2:#686B76; --ink-3:#989BA5; --ink-4:#B4B6BF;
+    --screen:#F3F4F7; --surface:#FFFFFF; --hairline:#F0F1F4; --border:#E8E9ED;
+    --gold:#9A7B3F; --gold-soft:#F4EEDF; --gold-bd:#E8DCBE;
+    --green:#137A4F; --green-soft:#E7F2EC;
+    --orange:#C05000; --orange-soft:#FFF0E6;
+    --font:'Hanken Grotesk', -apple-system, system-ui, sans-serif;
+  }
+  * { box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+  html, body { margin:0; height:100%; }
+  body {
+    font-family:var(--font);
+    background:#E4E6EC;
+    background-image:radial-gradient(120% 80% at 50% -10%, #EFF0F4 0%, #DEE0E8 75%);
+    display:grid; place-items:center; min-height:100vh; padding:24px;
+    color:var(--ink); letter-spacing:-0.01em;
+  }
+
+  /* ── Shell ── */
+  .app { min-height:100%; display:flex; flex-direction:column; background:var(--screen); position:relative; overflow:hidden; }
+  .scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+
+  /* ── Push notification ── */
+  .push-notif {
+    position:absolute; top:108px; left:14px; right:14px; z-index:30;
+    background:rgba(26,27,34,.94); backdrop-filter:blur(14px);
+    border-radius:14px; padding:11px 13px;
+    display:flex; align-items:center; gap:11px;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    padding:52px 18px 12px; background:var(--surface);
+    display:flex; align-items:center; gap:11px; flex:none;
+    border-bottom:1px solid var(--hairline);
+  }
+  .brand-dot {
+    width:34px; height:34px; border-radius:10px; flex:none;
+    background:var(--ink); color:#fff; display:grid; place-items:center;
+    font-weight:800; font-size:16px;
+  }
+  .brand-meta { flex:1; min-width:0; line-height:1.25; }
+  .brand-name { font-size:14px; font-weight:700; letter-spacing:-0.01em; }
+  .brand-sub  { font-size:11.5px; color:var(--ink-3); font-weight:500; }
+  .demo-tag {
+    font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--gold); background:var(--gold-soft); border:1px solid var(--gold-bd);
+    padding:4px 9px; border-radius:999px; flex:none;
+  }
+  .hdr-btn {
+    width:34px; height:34px; border-radius:10px; background:var(--screen);
+    border:1px solid var(--hairline); display:grid; place-items:center;
+    color:var(--ink-2); cursor:pointer; flex:none;
+  }
+
+  /* ── Typography ── */
+  .eyebrow { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); }
+  .lh { display:flex; align-items:center; justify-content:space-between; margin:24px 18px 11px; }
+  .lh-link { font-size:13px; font-weight:600; color:var(--accent); cursor:pointer; }
+
+  /* ── Account card (banking context, dark) ── */
+  .acct-card {
+    margin:14px 18px 0; border-radius:20px; padding:20px 20px 18px;
+    background:var(--ink);
+    background-image:radial-gradient(130% 120% at 80% -15%, #2C2E3A 0%, #1B1C22 60%);
+    color:#fff; position:relative; overflow:hidden;
+  }
+  .acct-label { font-size:11.5px; color:rgba(255,255,255,.45); font-weight:600; letter-spacing:.01em; margin-bottom:6px; }
+  .acct-bal { font-size:28px; font-weight:700; letter-spacing:-0.03em; line-height:1; font-variant-numeric:tabular-nums; margin-bottom:3px; }
+  .acct-num { font-size:12px; color:rgba(255,255,255,.38); font-weight:500; margin-bottom:16px; }
+  .acct-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  .acct-btn { display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; }
+  .acct-btn-ic {
+    width:44px; height:44px; border-radius:13px; flex:none;
+    background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.07);
+    display:grid; place-items:center; color:rgba(255,255,255,.8);
+  }
+  .acct-btn-label { font-size:11px; font-weight:600; color:rgba(255,255,255,.5); }
+
+  /* ── STARS section header ── */
+  .stars-section { display:flex; align-items:center; justify-content:space-between; margin:24px 18px 11px; }
+  .stars-badge {
+    font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--accent); background:var(--accent-soft); border:1px solid var(--accent-tint);
+    padding:3px 8px; border-radius:999px;
+  }
+
+  /* ── Generic card ── */
+  .card { background:var(--surface); border-radius:18px; border:1px solid var(--hairline); }
+  .card-pad { padding:16px 18px; }
+
+  /* ── Module icon ── */
+  .mod-ic { width:34px; height:34px; border-radius:10px; flex:none; display:grid; place-items:center; }
+
+  /* ── Segment bars ── */
+  .seg-row { display:flex; gap:4px; }
+  .seg { flex:1; height:4px; border-radius:999px; background:var(--hairline); }
+  .seg.on { background:var(--accent); }
+  .seg.done { background:var(--green); }
+
+  /* ── Thin track ── */
+  .track { height:5px; border-radius:999px; background:var(--hairline); overflow:hidden; }
+  .fill { height:100%; border-radius:999px; }
+
+  /* ── Hero rewards card ── */
+  .hero {
+    margin:10px 18px 0; border-radius:22px; padding:20px 22px 18px;
+    background:var(--ink);
+    background-image:radial-gradient(130% 120% at 85% -20%, #2C2E3A 0%, #1B1C22 60%);
+    color:#fff; position:relative; overflow:hidden;
+  }
+  .hero-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .hero-lbl { font-size:12px; font-weight:600; color:rgba(255,255,255,.5); letter-spacing:.01em; }
+  .tier-pill {
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; font-weight:700; color:#EBD9A8;
+    background:rgba(235,217,168,.12); border:1px solid rgba(235,217,168,.26);
+    padding:5px 11px 5px 9px; border-radius:999px;
+  }
+  .tier-pill .gd { width:6px; height:6px; border-radius:50%; background:#E4C77E; }
+  .hero-bal { display:flex; align-items:baseline; gap:7px; margin-bottom:16px; }
+  .hero-num { font-size:40px; font-weight:700; letter-spacing:-0.035em; line-height:1; font-variant-numeric:tabular-nums; }
+  .hero-unit { font-size:14px; font-weight:600; color:rgba(255,255,255,.45); }
+  .hero-rule { height:1px; background:rgba(255,255,255,.1); margin-bottom:13px; }
+  .prog-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:7px; }
+  .prog-lbl { font-size:12px; font-weight:500; color:rgba(255,255,255,.65); }
+  .prog-pct { font-size:12px; font-weight:700; color:#EBD9A8; font-variant-numeric:tabular-nums; }
+  .hero-track { height:5px; border-radius:999px; background:rgba(255,255,255,.12); overflow:hidden; }
+  .hero-fill { height:100%; border-radius:999px; background:rgba(255,255,255,.85); }
+  .hero-foot { font-size:11.5px; color:rgba(255,255,255,.38); margin-top:10px; line-height:1.5; }
+
+  /* ── Mission row ── */
+  .mission-row {
+    display:flex; align-items:center; gap:12px; padding:14px 16px;
+    border-bottom:1px solid var(--hairline);
+  }
+  .mission-row:last-child { border-bottom:none; }
+  .m-title { font-size:14px; font-weight:700; letter-spacing:-0.01em; line-height:1.25; }
+  .m-sub { font-size:12px; color:var(--ink-3); margin-top:2px; line-height:1.4; }
+
+  /* ── Reward row ── */
+  .reward-row {
+    display:flex; align-items:center; gap:12px; padding:13px 16px;
+    border-bottom:1px solid var(--hairline);
+  }
+  .reward-row:last-child { border-bottom:none; }
+  .r-ic { width:38px; height:38px; border-radius:11px; flex:none; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); }
+  .r-name { font-size:13.5px; font-weight:600; line-height:1.3; }
+  .r-cost { font-size:12px; color:var(--ink-3); font-weight:600; margin-top:2px; }
+
+  /* ── Points history row ── */
+  .pts-row { display:flex; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--hairline); }
+  .pts-row:last-child { border-bottom:none; }
+  .pts-ic { width:34px; height:34px; border-radius:10px; flex:none; display:grid; place-items:center; }
+  .pts-ic.earn  { background:var(--green-soft); color:var(--green); }
+  .pts-ic.spend { background:var(--accent-soft); color:var(--accent); }
+  .pts-title { font-size:13px; font-weight:600; }
+  .pts-sub   { font-size:11.5px; color:var(--ink-3); margin-top:1px; }
+  .pts-amt   { font-size:13.5px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .pts-amt.pos { color:var(--green); }
+  .pts-amt.neg { color:var(--ink-2); }
+
+  /* ── Banking transaction row (muted) ── */
+  .bank-row { display:flex; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--hairline); }
+  .bank-row:last-child { border-bottom:none; }
+  .bank-ic { width:32px; height:32px; border-radius:10px; background:var(--screen); border:1px solid var(--hairline); flex:none; display:grid; place-items:center; color:var(--ink-4); }
+  .bank-title { font-size:13px; font-weight:600; color:var(--ink-2); }
+  .bank-sub   { font-size:11.5px; color:var(--ink-4); margin-top:1px; }
+  .bank-amt   { font-size:13px; font-weight:600; color:var(--ink-3); font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  /* ── Pill badge ── */
+  .pill {
+    display:inline-flex; align-items:center; font-size:11px; font-weight:700;
+    letter-spacing:.02em; padding:4px 10px; border-radius:999px; white-space:nowrap; flex:none;
+  }
+
+  /* ── Buttons ── */
+  .btn-pill {
+    display:inline-flex; align-items:center; justify-content:center; gap:5px; flex:none;
+    height:32px; padding:0 13px; border-radius:10px; border:none; cursor:pointer;
+    font-family:inherit; font-size:12.5px; font-weight:600; letter-spacing:-0.01em;
+    transition:opacity .15s;
+  }
+  .btn-pill:active { opacity:.75; }
+
+  /* ── Bottom nav ── */
+  .nav {
+    flex:none; display:flex; padding:8px 4px 26px;
+    background:rgba(243,244,247,.96); backdrop-filter:blur(12px);
+    border-top:1px solid var(--hairline);
+    position:sticky; bottom:0; z-index:10;
+  }
+  .nav-btn {
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+    padding:5px 0; color:var(--ink-3); transition:color .15s;
+    background:none; border:none; font-family:inherit; cursor:pointer;
+  }
+  .nav-btn.on { color:var(--accent); }
+  .nav-btn.dim { opacity:.35; cursor:default; pointer-events:none; }
+  .nav-lbl { font-size:10px; font-weight:600; letter-spacing:.005em; }
+
+  /* ── Animations ── */
+  .fade { animation:fade .26s ease; }
+  .pop  { animation:pop  .32s cubic-bezier(.22,.68,0,1.2); }
+  @keyframes fade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+  @keyframes pop  { from { opacity:0; transform:scale(.93);      } to { opacity:1; transform:none; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="ios-frame.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+(function () {
+  const { useState, useEffect, useRef } = React;
+
+  /* ── Icons ───────────────────────────────────────────────── */
+  const Svg = (paths, p = {}) =>
+    React.createElement('svg', {
+      width: p.size || 20, height: p.size || 20,
+      viewBox: '0 0 24 24', fill: 'none',
+      stroke: 'currentColor', strokeWidth: p.sw || 1.8,
+      strokeLinecap: 'round', strokeLinejoin: 'round',
+      ...p, size: undefined, sw: undefined
+    }, (Array.isArray(paths) ? paths : [paths]).map((d, i) =>
+      React.createElement('path', { key: i, d })
+    ));
+
+  const ICONS = {
+    home:    p => Svg(['M3 10.5 12 3l9 7.5','M5 9.5V20a1 1 0 0 0 1 1h4v-5h4v5h4a1 1 0 0 0 1-1V9.5'], p),
+    star:    p => Svg('m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.6 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z', p),
+    gift:    p => Svg(['M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8','M2 7h20v5H2z','M12 21V7','M12 7a3 3 0 1 1-3-3','M12 7a3 3 0 1 0 3-3'], p),
+    pay:     p => Svg(['M2 5h20a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z','M1 10h22'], p),
+    more:    p => Svg('M12 5v.01M12 12v.01M12 19v.01', p),
+    bolt:    p => Svg('M13 2 4 14h7l-1 8 9-12h-7l1-8z', p),
+    check:   p => Svg('m5 12 5 5L20 7', p),
+    chev:    p => Svg('m9 6 6 6-6 6', p),
+    flame:   p => Svg('M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z', p),
+    phone:   p => Svg(['M7 2h10a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z','M11 18h2'], p),
+    send:    p => Svg(['M22 2L11 13','M22 2 15 22l-4-9-9-4 20-7z'], p),
+    receipt: p => Svg(['M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2','M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z','M9 14h6','M9 10h6'], p),
+    qr:      p => Svg(['M3 3h7v7H3z','M14 3h7v7h-7z','M3 14h7v7H3z','M14 17h2v-3h3v3','M17 14v0','M14 14v0','M20 20h-3v-2','M17 20v-3'], p),
+    layers:  p => Svg(['M12 2L2 7l10 5 10-5-10-5z','M2 17l10 5 10-5','M2 12l10 5 10-5'], p),
+    bell:    p => Svg(['M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9','M13.73 21a2 2 0 0 1-3.46 0'], p),
+  };
+  const Ic = (n, p = {}) => ICONS[n] ? ICONS[n](p) : null;
+
+  const fmt = n => n.toLocaleString('en-US');
+
+  /* ── Topbar ──────────────────────────────────────────────── */
+  function Topbar({ tab }) {
+    const isRewards = tab === 'rewards';
+    return (
+      <div className="topbar">
+        <div className="brand-dot">M</div>
+        <div className="brand-meta">
+          <div className="brand-name">{isRewards ? 'Rewards' : 'MTB Neo'}</div>
+          <div className="brand-sub" style={{ color: isRewards ? 'var(--accent)' : undefined }}>
+            {isRewards ? 'Powered by STARS' : 'Kaiser Jahangir'}
+          </div>
+        </div>
+        <span className="demo-tag">DEMO</span>
+        {!isRewards && (
+          <div className="hdr-btn">{Ic('bell', { size: 17 })}</div>
+        )}
+      </div>
+    );
+  }
+
+  /* ── SCREEN 1 — HOME ─────────────────────────────────────── */
+  function ScreenHome({ go, balance, billBonusLive, billBonusDone, billBonusStatus, pfmStreakLive }) {
+    return (
+      <div className="scroll fade">
+
+        {/* ── Banking account card ── */}
+        <div className="acct-card">
+          <div className="acct-label">Savings Account</div>
+          <div className="acct-bal">
+            ৳ 1,24,582
+            <span style={{ fontSize: 17, fontWeight: 600, color: 'rgba(255,255,255,.5)' }}>.40</span>
+          </div>
+          <div className="acct-num">MTB Neo · ****4821 &nbsp;·&nbsp; Current balance</div>
+          <div className="acct-actions">
+            {[['send','Pay'],['pay','Transfer'],['receipt','Bills'],['qr','QR']].map(([ic, lbl]) => (
+              <div className="acct-btn" key={ic}>
+                <div className="acct-btn-ic">{Ic(ic, { size: 17 })}</div>
+                <span className="acct-btn-label">{lbl}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── STARS loyalty modules ── */}
+        <div className="stars-section">
+          <span className="eyebrow">For you</span>
+        </div>
+
+        {/* Module 1 — 5-Day PFM Streak (visible only after rule is live) */}
+        {pfmStreakLive && (<div style={{ padding: '0 18px', marginBottom: 10 }}>
+          <div className="card card-pad">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 10 }}>
+              <div className="mod-ic" style={{ background: 'var(--orange-soft)', color: 'var(--orange)' }}>
+                {Ic('flame', { size: 16 })}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.01em' }}>5-Day PFM Streak</div>
+                <div style={{ fontSize: 12, color: 'var(--ink-3)', marginTop: 1 }}>Open Personal Finance Management daily</div>
+              </div>
+              <span className="pill" style={{ background: 'var(--orange-soft)', color: 'var(--orange)' }}>Day 1</span>
+            </div>
+            <div className="seg-row">
+              <div className="seg done"></div>
+              <div className="seg"></div>
+              <div className="seg"></div>
+              <div className="seg"></div>
+              <div className="seg"></div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 11 }}>
+              <span style={{ fontSize: 12, color: 'var(--ink-3)', fontWeight: 600 }}>1 of 5 complete · +200 pts on completion</span>
+              <button className="btn-pill" style={{ background: 'var(--orange-soft)', color: 'var(--orange)', height: 28, fontSize: 11.5 }}>Open PFM</button>
+            </div>
+          </div>
+        </div>)}
+
+        {/* Module 2 — Bill Pay Bonus (visible only after campaign is live) */}
+        {billBonusLive && (
+          <div style={{ padding: '0 18px', marginBottom: 10 }}>
+            <div
+              className="card card-pad"
+              onClick={() => go('rewards')}
+              style={{
+                cursor: 'pointer',
+                border: billBonusDone ? '1px solid rgba(19,122,79,.18)' : '1px solid var(--hairline)',
+                background: billBonusDone ? 'rgba(19,122,79,.02)' : 'var(--surface)',
+                transition: 'all .3s'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+                <div
+                  className="mod-ic"
+                  style={{
+                    background: billBonusDone ? 'var(--green-soft)' : 'var(--accent-soft)',
+                    color: billBonusDone ? 'var(--green)' : 'var(--accent)',
+                    transition: 'all .3s'
+                  }}
+                >
+                  {billBonusDone ? Ic('check', { size: 16, sw: 2.3 }) : Ic('bolt', { size: 16 })}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.01em' }}>
+                    {billBonusDone ? 'Bill Pay Bonus complete!' : 'Pay 1 bill · earn 500 pts'}
+                  </div>
+                  <div style={{ fontSize: 12, marginTop: 1, color: billBonusDone ? 'var(--green)' : 'var(--ink-3)' }}>
+                    {billBonusDone ? '+500 pts added to your balance' : 'Bill Pay Bonus · Ends Jun 30'}
+                  </div>
+                </div>
+                <span
+                  className="pill"
+                  style={{
+                    background: billBonusDone ? 'var(--green-soft)' : 'var(--accent-soft)',
+                    color: billBonusDone ? 'var(--green)' : 'var(--accent)',
+                    transition: 'all .3s'
+                  }}
+                >
+                  {billBonusDone ? 'Done' : '+500 pts'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Module 3 — Tier progress */}
+        <div style={{ padding: '0 18px', marginBottom: 0 }}>
+          <div className="card card-pad" onClick={() => go('rewards')} style={{ cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 10 }}>
+              <div className="mod-ic" style={{ background: 'var(--gold-soft)', color: 'var(--gold)' }}>
+                {Ic('star', { size: 15, sw: 2 })}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.01em' }}>28% away from Platinum</div>
+                <div style={{ fontSize: 12, color: 'var(--ink-3)', marginTop: 1 }}>Earn 5,580 more pts this quarter</div>
+              </div>
+              <span style={{ color: 'var(--ink-4)' }}>{Ic('chev', { size: 16, sw: 2 })}</span>
+            </div>
+            <div className="track">
+              <div className="fill" style={{ width: '72%', background: 'var(--gold)' }}></div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 11, color: 'var(--ink-3)', fontWeight: 600 }}>
+              <span>Gold</span>
+              <span style={{ color: 'var(--gold)' }}>Platinum · 72% there</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent banking transactions (muted context) */}
+        <div className="lh" style={{ marginTop: 26 }}>
+          <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.015em' }}>Recent transactions</span>
+        </div>
+        <div className="card" style={{ margin: '0 18px 28px', padding: 0, overflow: 'hidden' }}>
+          {[
+            { ic: 'receipt', title: 'Electricity bill',    sub: 'DPDC · 3 days ago',   amt: '-৳1,200' },
+            { ic: 'send',    title: 'Nagad transfer',      sub: 'To +880 17** · 5d',    amt: '-৳500' },
+            { ic: 'pay',     title: 'Mobile recharge',     sub: 'Robi · 7 days ago',    amt: '-৳200' },
+          ].map((t, i) => (
+            <div className="bank-row" key={i}>
+              <div className="bank-ic">{Ic(t.ic, { size: 14 })}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="bank-title">{t.title}</div>
+                <div className="bank-sub">{t.sub}</div>
+              </div>
+              <span className="bank-amt">{t.amt}</span>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    );
+  }
+
+  /* ── SCREEN 2 — REWARDS ──────────────────────────────────── */
+  function ScreenRewards({ balance, billBonusLive, billBonusDone, billBonusStatus, voucherRedeemed, redeemVoucher, pfmStreakLive }) {
+    return (
+      <div className="scroll fade">
+
+        {/* Hero — balance + tier + progress */}
+        <div className="hero">
+          <div className="hero-top">
+            <span className="hero-lbl">Points Balance</span>
+            <span className="tier-pill"><span className="gd"></span>Gold</span>
+          </div>
+          <div className="hero-bal">
+            <span className="hero-num">{fmt(balance)}</span>
+            <span className="hero-unit">pts</span>
+          </div>
+          <div className="hero-rule"></div>
+          <div className="prog-row">
+            <span className="prog-lbl">Progress to Platinum</span>
+            <span className="prog-pct">72%</span>
+          </div>
+          <div className="hero-track">
+            <div className="hero-fill" style={{ width: '72%' }}></div>
+          </div>
+          <div className="hero-foot">Earn 5,580 more pts this quarter to reach Platinum.</div>
+        </div>
+
+        {/* Active missions */}
+        <div style={{ margin: '20px 18px 0' }}>
+          <div className="eyebrow" style={{ marginBottom: 11 }}>Active missions</div>
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+
+            {/* Streak (visible only after rule is live) */}
+            {pfmStreakLive && (<div className="mission-row">
+              <div className="mod-ic" style={{ background: 'var(--orange-soft)', color: 'var(--orange)', width: 36, height: 36, borderRadius: 11 }}>
+                {Ic('flame', { size: 17 })}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="m-title">5-Day PFM Streak</div>
+                <div className="m-sub">1 of 5 days complete · Open PFM daily</div>
+                <div className="seg-row" style={{ marginTop: 8 }}>
+                  <div className="seg done"></div>
+                  <div className="seg"></div>
+                  <div className="seg"></div>
+                  <div className="seg"></div>
+                  <div className="seg"></div>
+                </div>
+              </div>
+              <div style={{ textAlign: 'right', flex: 'none' }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--orange)', letterSpacing: '-0.02em' }}>+200</div>
+                <div style={{ fontSize: 10, color: 'var(--ink-4)', fontWeight: 600, marginTop: 1 }}>pts</div>
+              </div>
+            </div>)}
+
+            {/* Bill Pay Bonus (console-synced) */}
+            {billBonusLive && (
+              <div
+                className="mission-row"
+                style={{ background: billBonusDone ? 'rgba(19,122,79,.03)' : 'var(--surface)', transition: 'background .3s' }}
+              >
+                <div
+                  className="mod-ic"
+                  style={{
+                    background: billBonusDone ? 'var(--green-soft)' : 'var(--accent-soft)',
+                    color: billBonusDone ? 'var(--green)' : 'var(--accent)',
+                    width: 36, height: 36, borderRadius: 11, transition: 'all .3s'
+                  }}
+                >
+                  {billBonusDone ? Ic('check', { size: 17, sw: 2.3 }) : Ic('bolt', { size: 17 })}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="m-title">Bill Pay Bonus</div>
+                  <div className="m-sub">
+                    {billBonusDone
+                      ? 'Completed · +500 pts earned'
+                      : 'Pay 1 bill · Ends Jun 30'}
+                  </div>
+                </div>
+                <span
+                  className="pill"
+                  style={{
+                    background: billBonusDone ? 'var(--green-soft)' : 'var(--accent-soft)',
+                    color: billBonusDone ? 'var(--green)' : 'var(--accent)',
+                    transition: 'all .3s'
+                  }}
+                >
+                  {billBonusDone ? 'Done ✓' : '+500 pts'}
+                </span>
+              </div>
+            )}
+
+            {/* Refer a friend */}
+            <div className="mission-row">
+              <div className="mod-ic" style={{ background: 'var(--accent-soft)', color: 'var(--accent)', width: 36, height: 36, borderRadius: 11 }}>
+                {Ic('layers', { size: 17 })}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="m-title">Refer a friend</div>
+                <div className="m-sub">Invite someone to MTB Neo</div>
+              </div>
+              <span className="pill" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>+500 pts</span>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Redeem */}
+        <div style={{ margin: '20px 18px 0' }}>
+          <div className="eyebrow" style={{ marginBottom: 11 }}>Redeem points</div>
+
+          {voucherRedeemed && (
+            <div
+              className="pop"
+              style={{
+                marginBottom: 11, background: 'var(--green-soft)',
+                border: '1px solid rgba(19,122,79,.15)', borderRadius: 13,
+                padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10
+              }}
+            >
+              <div style={{ width: 26, height: 26, borderRadius: 8, flex: 'none', display: 'grid', placeItems: 'center', background: 'rgba(19,122,79,.12)', color: 'var(--green)' }}>
+                {Ic('check', { size: 13, sw: 2.5 })}
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--green)' }}>৳100 Recharge Voucher redeemed · 1,000 pts</span>
+            </div>
+          )}
+
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            {[
+              { ic: 'phone', name: '৳100 Mobile Recharge',    cost: '1,000 pts', isVoucher: true  },
+              { ic: 'bolt',  name: 'Utility Bill Cashback',    cost: '2,500 pts', isVoucher: false },
+              { ic: 'gift',  name: 'Coffee Partner Voucher',   cost: '1,200 pts', isVoucher: false },
+            ].map((r, i) => {
+              const redeemed = r.isVoucher && voucherRedeemed;
+              return (
+                <div className="reward-row" key={i}>
+                  <div className="r-ic" style={redeemed ? { background: 'var(--green-soft)', color: 'var(--green)' } : {}}>
+                    {redeemed ? Ic('check', { size: 17, sw: 2 }) : Ic(r.ic, { size: 17 })}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="r-name">{r.name}</div>
+                    <div className="r-cost" style={redeemed ? { color: 'var(--green)' } : {}}>
+                      {redeemed ? 'Redeemed' : r.cost}
+                    </div>
+                  </div>
+                  {redeemed ? (
+                    <span className="pill" style={{ background: 'var(--green-soft)', color: 'var(--green)' }}>Done</span>
+                  ) : (
+                    <button
+                      className="btn-pill"
+                      style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
+                      onClick={r.isVoucher ? redeemVoucher : undefined}
+                    >
+                      Redeem
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Points history */}
+        <div style={{ margin: '20px 18px 28px' }}>
+          <div className="eyebrow" style={{ marginBottom: 11 }}>Points history</div>
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            {[
+              { dir: 'earn',  title: 'QR Payment Bonus',         sub: '2 days ago',   amt: '+200'    },
+              { dir: 'earn',  title: 'Mobile recharge',          sub: '4 days ago',   amt: '+50'     },
+              { dir: 'spend', title: 'Recharge Voucher redeemed',sub: '6 days ago',   amt: '-1,000'  },
+              { dir: 'earn',  title: 'Welcome Bonus',            sub: '2 weeks ago',  amt: '+500'    },
+            ].map((a, i) => (
+              <div className="pts-row" key={i}>
+                <div className={'pts-ic ' + a.dir}>{Ic(a.dir === 'earn' ? 'star' : 'gift', { size: 15 })}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="pts-title">{a.title}</div>
+                  <div className="pts-sub">{a.sub}</div>
+                </div>
+                <span className={'pts-amt ' + (a.dir === 'earn' ? 'pos' : 'neg')}>{a.amt}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    );
+  }
+
+  /* ── Bottom nav ──────────────────────────────────────────── */
+  function Nav({ tab, go }) {
+    const ITEMS = [
+      ['home',    'Home',    'home'],
+      ['pay',     'Pay',     'pay'],
+      ['cards',   'Cards',   'pay'],
+      ['rewards', 'Rewards', 'star'],
+      ['more',    'More',    'more'],
+    ];
+    const ACTIVE = new Set(['home', 'rewards']);
+    return (
+      <div className="nav">
+        {ITEMS.map(([id, label, icon]) => (
+          <button
+            key={id}
+            className={'nav-btn' + (tab === id ? ' on' : '') + (!ACTIVE.has(id) ? ' dim' : '')}
+            onClick={() => ACTIVE.has(id) ? go(id) : null}
+          >
+            {Ic(icon, { size: 22, sw: tab === id ? 2.2 : 1.7 })}
+            <span className="nav-lbl">{label}</span>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  /* ── App root ────────────────────────────────────────────── */
+  function App() {
+    const [tab, setTab] = useState(() => {
+      const t = localStorage.getItem('mtb_tab');
+      return (t === 'home' || t === 'rewards') ? t : 'home';
+    });
+    const [voucherRedeemed,  setVoucherRedeemed]  = useState(() => localStorage.getItem('mtb_voucher') === 'true');
+    const [billBonusStatus,  setBillBonusStatus]  = useState(() => localStorage.getItem('demo_billbonus_status') || '');
+    const [billBonusLive,    setBillBonusLive]    = useState(() => localStorage.getItem('demo_billbonus_status') === 'live');
+    const [billBonusDone,    setBillBonusDone]    = useState(() => localStorage.getItem('demo_billbonus_done') === 'true');
+    const [pfmStreakLive,    setPfmStreakLive]    = useState(() => localStorage.getItem('demo_pfmstreak_status') === 'live');
+    const [showNotif,        setShowNotif]        = useState(false);
+    const prevDone = useRef(false);
+
+    /* Sync with console via localStorage */
+    useEffect(() => {
+      const onStorage = e => {
+        if (e.key === 'demo_billbonus_status') {
+          setBillBonusStatus(e.newValue || '');
+          setBillBonusLive(e.newValue === 'live');
+        }
+        if (e.key === 'demo_billbonus_done') setBillBonusDone(e.newValue === 'true');
+        if (e.key === 'demo_pfmstreak_status') setPfmStreakLive(e.newValue === 'live');
+        if (e.key === 'demo_reset') {
+          setVoucherRedeemed(false);
+          setBillBonusLive(false); setBillBonusDone(false); setBillBonusStatus('');
+          setShowNotif(false); prevDone.current = false; setPfmStreakLive(false);
+        }
+      };
+      window.addEventListener('storage', onStorage);
+      const poll = setInterval(() => {
+        const bps = localStorage.getItem('demo_billbonus_status');
+        setBillBonusStatus(bps || '');
+        setBillBonusLive(bps === 'live');
+        setBillBonusDone(localStorage.getItem('demo_billbonus_done') === 'true');
+        setPfmStreakLive(localStorage.getItem('demo_pfmstreak_status') === 'live');
+      }, 1500);
+      return () => { window.removeEventListener('storage', onStorage); clearInterval(poll); };
+    }, []);
+
+    const balance = 18420 - (voucherRedeemed ? 1000 : 0) + (billBonusDone ? 500 : 0);
+
+    const go = t => { setTab(t); localStorage.setItem('mtb_tab', t); };
+    const redeemVoucher = () => { setVoucherRedeemed(true); localStorage.setItem('mtb_voucher', 'true'); };
+
+    /* Push notification when bill bonus completes */
+    useEffect(() => {
+      if (billBonusDone && !prevDone.current) {
+        setShowNotif(true);
+        prevDone.current = true;
+        const t = setTimeout(() => setShowNotif(false), 6000);
+        return () => clearTimeout(t);
+      }
+      if (!billBonusDone) prevDone.current = false;
+    }, [billBonusDone]);
+
+    const shared = { balance, billBonusLive, billBonusDone, billBonusStatus, voucherRedeemed, redeemVoucher, go, pfmStreakLive };
+
+    return (
+      <window.IOSDevice>
+        <div className="app">
+          <Topbar tab={tab} />
+
+          {showNotif && (
+            <div className="push-notif pop">
+              <div style={{ width: 32, height: 32, borderRadius: 10, flex: 'none', display: 'grid', placeItems: 'center', background: 'rgba(235,193,100,.18)', fontSize: 17 }}>⭐</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', letterSpacing: '-.01em' }}>You earned 500 points</div>
+                <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,.5)', marginTop: 2 }}>Bill Pay Bonus completed</div>
+              </div>
+              <button
+                onClick={() => setShowNotif(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,.3)', fontSize: 20, padding: 0, fontFamily: 'inherit', lineHeight: 1 }}
+              >×</button>
+            </div>
+          )}
+
+          {tab === 'home'    && <ScreenHome    {...shared} key="home"    />}
+          {tab === 'rewards' && <ScreenRewards {...shared} key="rewards" />}
+
+          <Nav tab={tab} go={go} />
+        </div>
+      </window.IOSDevice>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+})();
+</script>
+</body>
+</html>
