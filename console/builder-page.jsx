@@ -185,6 +185,13 @@ function BPAudience({ f, set }) {
           </div>
         </div>
       </div>
+      <div className="callout" style={{ background:'var(--accent-soft)', border:'1px solid rgba(79,91,213,.15)', borderRadius:'var(--r-md)', padding:'12px 14px', display:'flex', alignItems:'flex-start', gap:10, marginBottom:12 }}>
+        <span style={{ color:'var(--accent)', flex:'none', marginTop:1 }}>{window.Ic('bolt',{size:18,sw:1.7})}</span>
+        <div>
+          <div style={{ fontSize:13, fontWeight:700, color:'var(--text)', marginBottom:3 }}>Recommended by STARS Intelligence</div>
+          <div style={{ fontSize:12.5, color:'var(--text-2)', lineHeight:1.45 }}>Based on NEO Growth Score analysis, <strong>Activated but No Bill Pay</strong> (28,300 users) is the highest-priority segment for this campaign type — 91% confidence score.</div>
+        </div>
+      </div>
       <div className="callout info"><span className="c-ic">{window.Ic('info',{size:18,sw:1.7})}</span><div><div className="callout-title">Reach resolved at publish time</div>Final audience is drawn live from the MTB Neo member ledger when the campaign activates.</div></div>
     </div>
   );

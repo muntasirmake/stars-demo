@@ -111,6 +111,28 @@ function Dashboard({ campaigns, onOpenBudget, onCreate }) {
         <CampaignTable campaigns={campaigns.slice(0, 5)} onOpenBudget={onOpenBudget} compact title="Recent campaigns" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div className="card card-pad">
+            <div style={{ marginBottom:14 }}>
+              <div className="card-title" style={{ marginBottom:3 }}>NEO Growth Score</div>
+              <div className="xsmall muted-2">STARS Intelligence · 175,100 users classified</div>
+            </div>
+            <div style={{ display:'flex', gap:0, borderRadius:'var(--r-md)', overflow:'hidden', height:6, marginBottom:14 }}>
+              {[{c:'var(--slate)',p:18},{c:'var(--amber)',p:16},{c:'var(--blue)',p:31},{c:'var(--accent)',p:22},{c:'var(--green)',p:13}].map((s,i)=>(
+                <div key={i} style={{ flex:s.p, background:s.c, opacity:.7 }}></div>
+              ))}
+            </div>
+            {[['31,600','Onboarded','var(--slate)'],['28,300','Activated','var(--amber)'],['54,200','Frequent User','var(--blue)'],['38,900','Product Ready','var(--accent)'],['22,100','Super User','var(--green)']].map(([n,l,c],i)=>(
+              <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 0', borderBottom: i<4?'1px solid var(--border)':'none' }}>
+                <span style={{ fontSize:12.5, fontWeight:600, color:'var(--text-2)' }}>Stage {i} · {l}</span>
+                <span style={{ fontSize:13, fontWeight:700, color:c, fontVariantNumeric:'tabular-nums' }}>{n}</span>
+              </div>
+            ))}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:12, paddingTop:2 }}>
+              <span className="xsmall muted-2">3,420 moved up a stage this month</span>
+              <a className="link small">View details →</a>
+            </div>
+          </div>
+
+          <div className="card card-pad">
             <div className="spread" style={{ marginBottom: 6 }}>
               <div className="card-title">Activity</div>
               <a className="link small">View all</a>

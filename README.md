@@ -55,7 +55,7 @@ infinity-mtb-demo/
 
 | Field    | Value                                      |
 |----------|--------------------------------------------|
-| Email    | kaiser.jahangir@mutualtrustbank.com        |
+| Email    | kaiser@mutualtrustbank.com                 |
 | Password | MTBdemo@2026                               |
 
 ---

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STARS · Admin Console</title>
+<link rel="stylesheet" href="infinity.css">
+<style>
+  /* org dropdown */
+  .pop { position: absolute; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); z-index: 60; overflow: hidden; }
+  .pop-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; font-size: 13px; cursor: pointer; }
+  .pop-item:hover { background: var(--hover); }
+  .pop-item.on { color: var(--accent); font-weight: 600; }
+  .pop-sep { height: 1px; background: var(--border); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="console/icons.jsx"></script>
+<script type="text/babel" src="console/data.jsx"></script>
+<script type="text/babel" src="console/views.jsx"></script>
+<script type="text/babel" src="console/pages.jsx"></script>
+<script type="text/babel" src="console/builder.jsx"></script>
+<script type="text/babel" src="console/builder-page.jsx"></script>
+<script type="text/babel" src="console/analytics.jsx"></script>
+<script type="text/babel" src="console/rewards-catalogue.jsx"></script>
+<script type="text/babel" src="console/segments.jsx"></script>
+<script type="text/babel" src="console/personalization.jsx"></script>
+<script type="text/babel" src="console/stars-intelligence.jsx"></script>
+<script type="text/babel" src="console/tier-management.jsx"></script>
+<script type="text/babel" src="console/rules-engine.jsx"></script>
+<script type="text/babel" src="console/integrations-page.jsx"></script>
+<script type="text/babel" src="console/gamification.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+
+
+
+(function () {
+  const { useState, useEffect } = React;
+  const Ic = window.Ic;
+
+  const NAV = [
+  { group: 'Overview', items: [
+    { id: 'Dashboard', icon: 'dashboard' },
+    { id: 'Campaigns', icon: 'campaigns', count: 12 },
+    { id: 'Campaign Builder', icon: 'builder' },
+    { id: 'Rules Engine', icon: 'rules' }]
+  },
+  { group: 'Programs', items: [
+    { id: 'Rewards Catalogue', icon: 'rewards' },
+    { id: 'Customer Segments', icon: 'segments' },
+    { id: 'STARS Intelligence', icon: 'bolt' },
+    { id: 'Tier Management', icon: 'star' },
+    { id: 'Gamification', icon: 'gamification' },
+    { id: 'Analytics & Liability', icon: 'analytics' },
+    { id: 'Integrations', icon: 'integrations' }]
+  }];
+
+
+  // ── Login Screen ─────────────────────────────────────────────
+  function LoginScreen({ onLogin }) {
+    const [pass, setPass] = useState('');
+    const [err, setErr] = useState('');
+    const [loading, setLoading] = useState(false);
+    const email = 'kaiser@mutualtrustbank.com';
+
+    const handle = (e) => {
+      e.preventDefault();
+      if (pass === 'MTBdemo@2026') {setLoading(true);setTimeout(onLogin, 700);} else
+      setErr('Incorrect password.');
+    };
+
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'grid', placeItems: 'center', padding: 24 }}>
+      <div style={{ width: '100%', maxWidth: 380 }}>
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <img src="uploads/STARS-b7f543df.svg" alt="STARS" style={{ height: 26, width: 'auto', margin: '0 auto', display: 'block' }} />
+          <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 3 }}>MTB Neo · STARS Loyalty Admin</div>
+        </div>
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-xl)', padding: '26px 26px 22px' }}>
+          <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-.01em', marginBottom: 2 }}>Sign in</div>
+          <div style={{ fontSize: 13, color: 'var(--text-3)', marginBottom: 22 }}>Demo Mode environment · Demo access</div>
+          <form onSubmit={handle} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="field">
+              <label className="label">Email</label>
+              <input className="input" type="email" value={email} readOnly style={{ background: 'var(--bg-sunken)', color: 'var(--text-2)', cursor: 'default' }} />
+            </div>
+            <div className="field">
+              <label className="label">Password</label>
+              <input className="input" type="password" value={pass} onChange={(e) => {setPass(e.target.value);setErr('');}} placeholder="Enter password" autoFocus />
+            </div>
+            {err &&
+              <div style={{ fontSize: 12.5, color: 'var(--red)', background: 'var(--red-bg)', border: '1px solid var(--red-bd)', borderRadius: 'var(--r-md)', padding: '9px 12px' }}>{err}</div>
+              }
+            <button className="btn btn-primary" type="submit" style={{ width: '100%', marginTop: 4 }} disabled={loading}>
+              {loading ? 'Signing in…' : 'Sign in'}
+            </button>
+          </form>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 12, fontSize: 11.5, color: 'var(--text-4)' }}>Demo environment · Not connected to production systems</div>
+      </div>
+    </div>);
+
+  }
+
+  // ── Notification Panel ────────────────────────────────────────
+  function NotifPanel({ notifs, setNotifs, onClose }) {
+    const tones = {
+      success: { bg: 'var(--green-bg)', fg: 'var(--green)', ic: 'check' },
+      pending: { bg: 'var(--amber-bg)', fg: 'var(--amber)', ic: 'warn' },
+      info: { bg: 'var(--accent-soft)', fg: 'var(--accent)', ic: 'star' }
+    };
+    const markRead = () => setNotifs((n) => n.map((x) => ({ ...x, read: true })));
+    return (
+      <div style={{ position: 'fixed', top: 'var(--header-h)', right: 16, width: 344, zIndex: 200, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-xl)', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 16px 11px', borderBottom: '1px solid var(--border)' }}>
+        <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-.01em' }}>Notifications</span>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {notifs.some((n) => !n.read) &&
+            <button onClick={markRead} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--accent)', fontWeight: 600, fontFamily: 'inherit', padding: 0 }}>Mark all read</button>
+            }
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', fontSize: 20, lineHeight: 1, fontFamily: 'inherit', padding: 0 }}>×</button>
+        </div>
+      </div>
+      {notifs.length === 0 ?
+        <div style={{ padding: '28px 16px', textAlign: 'center', color: 'var(--text-3)', fontSize: 13 }}>No notifications yet</div> :
+
+        <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+            {[...notifs].reverse().map((n) => {
+            const t = tones[n.tone] || tones.info;
+            return (
+              <div key={n.id} style={{ display: 'flex', gap: 11, padding: '12px 16px', background: n.read ? 'transparent' : 'rgba(79,91,213,.04)', borderBottom: '1px solid var(--border)' }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', flex: 'none', display: 'grid', placeItems: 'center', background: t.bg, color: t.fg }}>
+                    {Ic(t.ic, { size: 14, sw: 2.2 })}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, lineHeight: 1.45, fontWeight: n.read ? 450 : 600 }}>{n.msg}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 3 }}>{n.time}</div>
+                  </div>
+                </div>);
+
+          })}
+          </div>
+
+        }
+      <div style={{ padding: '9px 16px', borderTop: '1px solid var(--border)', fontSize: 11, color: 'var(--text-4)', textAlign: 'center', lineHeight: 1.5 }}>
+        Approval is simulated for demo. In production, this follows MTB's role-based workflow.
+      </div>
+    </div>);
+
+  }
+
+  // ── Campaign Detail Modal — Bill Pay Bonus ────────────────────
+  function BillPayBonusModal({ campaign, onClose }) {
+    const [done, setDone] = useState(() => localStorage.getItem('demo_billbonus_done') === 'true');
+
+    useEffect(() => {
+      const h = (e) => {if (e.key === 'demo_billbonus_done') setDone(e.newValue === 'true');};
+      window.addEventListener('storage', h);
+      const t = setInterval(() => setDone(localStorage.getItem('demo_billbonus_done') === 'true'), 1000);
+      return () => {window.removeEventListener('storage', h);clearInterval(t);};
+    }, []);
+
+    const sCol = { 'Live': 'var(--green)', 'Pending Approval': 'var(--amber)', 'Draft': 'var(--slate)' };
+    const sBg = { 'Live': 'var(--green-bg)', 'Pending Approval': 'var(--amber-bg)', 'Draft': 'var(--slate-bg)' };
+
+    return (
+      <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(22,22,40,.42)', zIndex: 100, backdropFilter: 'blur(2px)' }} />
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 'min(640px,96vw)', maxHeight: '88vh', overflowY: 'auto', background: 'var(--surface)', borderRadius: 'var(--r-xl)', zIndex: 101, padding: 28 }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 22 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 'var(--r-md)', background: 'var(--accent)', color: '#fff', display: 'grid', placeItems: 'center', fontSize: 19, fontWeight: 700, flex: 'none' }}>B</div>
+            <div>
+              <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-.02em', lineHeight: 1.2 }}>{campaign.name}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3 }}>{campaign.id} · Transaction-based mission</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, padding: '5px 11px', borderRadius: 'var(--r-pill)', color: sCol[campaign.status] || 'var(--slate)', background: sBg[campaign.status] || 'var(--slate-bg)' }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: sCol[campaign.status] || 'var(--slate)' }}></span>
+              {campaign.status}
+            </span>
+            <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', display: 'grid', placeItems: 'center', fontSize: 18, color: 'var(--text-3)' }}>×</button>
+          </div>
+        </div>
+
+        {/* Details grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, border: '1px solid var(--border)', borderRadius: 'var(--r-md)', overflow: 'hidden', marginBottom: 20, background: 'var(--border)' }}>
+          {[
+            ['Rule', 'Pay one utility bill through MTB Neo'],
+            ['Reward', '500 STARS · Fixed · Once per member'],
+            ['Audience', 'All MTB app users'],
+            ['Channel', 'Mobile app · MTB Neo'],
+            ['Validity', 'Jun 10 – Jun 30, 2026'],
+            ['Objective', 'Increase bill payment usage through MTB app']].
+            map(([k, v]) =>
+            <div key={k} style={{ background: 'var(--surface)', padding: '12px 16px' }}>
+              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 4 }}>{k}</div>
+              <div style={{ fontSize: 13.5, color: 'var(--text)', lineHeight: 1.4 }}>{v}</div>
+            </div>
+            )}
+        </div>
+
+        {/* Analytics */}
+        <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-.01em', marginBottom: 12 }}>Analytics</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 20 }}>
+          {[
+            ['Participants', done ? '1' : '0'],
+            ['Completed missions', done ? '1' : '0'],
+            ['STARS issued', done ? '500' : '0']].
+            map(([l, v]) =>
+            <div key={l} style={{ padding: '14px 16px', background: 'var(--bg-sunken)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}>
+              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 6 }}>{l}</div>
+              <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-.03em', fontVariantNumeric: 'tabular-nums', color: done && v !== '0' ? 'var(--accent)' : 'var(--text)', transition: 'color .3s' }}>{v}</div>
+            </div>
+            )}
+        </div>
+
+        {/* Event log */}
+        <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-.01em', marginBottom: 12 }}>Event log</div>
+        <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', overflow: 'hidden', marginBottom: 16 }}>
+          {done ?
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px' }}>
+              <div style={{ width: 32, height: 32, borderRadius: 'var(--r-sm)', flex: 'none', display: 'grid', placeItems: 'center', background: 'var(--green-bg)', color: 'var(--green)' }}>
+                {Ic('check', { size: 15, sw: 2.2 })}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 600 }}>Bill payment completed — 500 Stars issued</div>
+                <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>Kaiser Jahangir · Just now · MTB Neo app</div>
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 'var(--r-pill)', background: 'var(--green-bg)', color: 'var(--green)' }}>Completed</span>
+            </div> :
+
+            <div style={{ padding: '26px 16px', textAlign: 'center', color: 'var(--text-3)', fontSize: 13 }}>
+              No events yet. Simulate a bill payment from the Demo Simulator to see results.
+            </div>
+            }
+        </div>
+
+        {/* Demo note */}
+        <div style={{ padding: '11px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent-tint)', borderRadius: 'var(--r-md)', fontSize: 12, color: 'var(--accent-mid)', lineHeight: 1.55 }}>
+          <strong>Demo note:</strong> Approval is simulated for demo purposes. In production, this follows MTB's role-based approval workflow — Marketing Lead → Risk Team → Finance Review — before any campaign goes live.
+        </div>
+      </div>
+    </>);
+
+  }
+
+  // ── Sidebar ──────────────────────────────────────────────────
+  function Sidebar({ active, setActive }) {
+    const [orgOpen, setOrgOpen] = useState(false);
+    return (
+      <aside className="sidebar">
+      <div className="sb-brand"><img src="uploads/STARS-b7f543df.svg" alt="STARS" style={{ height: 24, width: 'auto', display: 'block', maxWidth: '80%' }} /></div>
+      <div style={{ position: 'relative' }}>
+        <div className="sb-org" onClick={() => setOrgOpen((o) => !o)}>
+          <div className="org-avatar">N</div>
+          <div className="org-meta"><div className="org-name">MTB Neo</div><div className="org-sub">STARS Loyalty · Demo Mode</div></div>
+          {Ic(orgOpen ? 'chevUp' : 'chevDown', { size: 14, className: 'chev' })}
+        </div>
+        {orgOpen &&
+          <div className="pop" style={{ left: 12, right: 12, top: 56 }}>
+            <div className="pop-item on"><div className="org-avatar" style={{ width: 22, height: 22 }}>N</div>MTB Neo · STARS Loyalty{Ic('check', { size: 14 })}</div>
+            <div className="pop-item"><div className="org-avatar" style={{ width: 22, height: 22, background: 'var(--slate)' }}>S</div>Sandbox</div>
+            <div className="pop-sep"></div>
+            <div className="pop-item muted">{Ic('plus', { size: 14 })}New workspace</div>
+          </div>
+          }
+      </div>
+      <nav className="sb-nav">
+        {NAV.map((g) =>
+          <div key={g.group}>
+            <div className="nav-group-label">{g.group}</div>
+            {g.items.map((it) =>
+            <a key={it.id} className={'nav-item' + (active === it.id ? ' active' : '')} onClick={() => setActive(it.id)}>
+                {Ic(it.icon, { size: 18 })}{it.id}
+                {it.count && <span className="badge-count">{it.count}</span>}
+              </a>
+            )}
+          </div>
+          )}
+      </nav>
+      <div className="sb-foot">
+        <div className="user-avatar">KJ</div>
+        <div className="user-meta"><div className="user-name">Kaiser Jahangir</div><div className="user-sub">Program Admin</div></div>
+        {Ic('chevUp', { size: 14, style: { color: 'var(--text-3)' } })}
+      </div>
+    </aside>);
+
+  }
+
+  // ── Header ───────────────────────────────────────────────────
+  function Header({ onCreate, notifs, setNotifs, notifOpen, setNotifOpen }) {
+    const unread = notifs.filter((n) => !n.read).length;
+    return (
+      <header className="header" style={{ position: 'relative' }}>
+      <div className="search">
+        {Ic('search', { size: 16, sw: 1.8 })}
+        <input placeholder="Search campaigns, segments, rewards…" />
+        <span className="kbd">⌘K</span>
+      </div>
+      <div className="header-right">
+        <span className="demo-pill"><span className="dot"></span>Demo</span>
+        <div style={{ position: 'relative' }}>
+          <button className="icon-btn" onClick={() => setNotifOpen((o) => !o)}>
+            {unread > 0 && <span className="ind"></span>}
+            {Ic('bell', { size: 18 })}
+          </button>
+          {notifOpen && <NotifPanel notifs={notifs} setNotifs={setNotifs} onClose={() => setNotifOpen(false)} />}
+        </div>
+        <button className="btn btn-primary" onClick={onCreate}>{Ic('plus', { size: 16 })}Create Campaign</button>
+      </div>
+    </header>);
+
+  }
+
+  // ── App ──────────────────────────────────────────────────────
+  function App() {
+    const [loggedIn, setLoggedIn] = useState(() => localStorage.getItem('demo_loggedIn') === 'true');
+    const [active, setActive] = useState('Dashboard');
+    const [campaigns, setCampaigns] = useState(window.DATA.campaigns);
+    const [budget, setBudget] = useState(null);
+    const [notifs, setNotifs] = useState([]);
+    const [notifOpen, setNotifOpen] = useState(false);
+    const [campaignDetail, setCampaignDetail] = useState(null);
+
+    // Cross-tab sync (Demo Simulator → Console)
+    useEffect(() => {
+      const handler = (e) => {
+        if (e.key === 'demo_reset') {
+          setCampaigns(window.DATA.campaigns);
+          setNotifs([]);
+          setNotifOpen(false);
+          setCampaignDetail(null);
+          setBudget(null);
+          setActive('Dashboard');
+          localStorage.removeItem('demo_pfmstreak_status');
+        }
+        if (e.key === 'demo_loggedIn' && e.newValue === null) setLoggedIn(false);
+      };
+      window.addEventListener('storage', handler);
+      return () => window.removeEventListener('storage', handler);
+    }, []);
+
+    // ── Login gate ──
+    if (!loggedIn) {
+      return <LoginScreen onLogin={() => {
+        localStorage.setItem('demo_loggedIn', 'true');
+        setLoggedIn(true);
+      }} />;
+    }
+
+    const openCreate = () => setActive('Campaign Builder');
+
+    // ── Campaign publish with approval simulation ──
+    const publish = (f) => {
+      const mark = (f.name || 'C').trim()[0].toUpperCase();
+      const isBonus = f.name && f.name.toLowerCase().replace(/\s+/g, '').includes('billpaybonus');
+      const newId = 'CMP_D' + Date.now().toString().slice(-5);
+      const camp = {
+        id: newId, mark, name: f.name || 'New Campaign',
+        status: 'Pending Approval',
+        trigger: isBonus ? 'Pay one utility bill' : f.triggerEvent || '—',
+        audience: isBonus ? 'All MTB app users' : f.segment === 'all' ? 'All active MTB Neo users' : f.segment === 'tier' ? 'Tier · Gold+ members' : 'Segment · Salaried',
+        issued: '0', liability: '৳0',
+        ends: f.endDate || (isBonus ? 'Jun 30' : 'Open'),
+        isDemo: isBonus
+      };
+
+      setCampaigns((cs) => [camp, ...cs]);
+      // Don't navigate — let builder's own Back button handle it so the confirmation screen stays visible
+
+      // Pending notification (silent — just the dot)
+      addNotif({ msg: `"${camp.name}" submitted for approval. Awaiting Marketing Lead and Risk sign-off.`, tone: 'pending' });
+      setNotifOpen(true);
+
+      if (isBonus) {
+        localStorage.setItem('demo_billbonus_status', 'pending');
+
+        setTimeout(() => {
+          setCampaigns((cs) => cs.map((c) => c.id === newId ? { ...c, status: 'Approved' } : c));
+          addNotif({ msg: '"Bill Pay Bonus" approved by the review team. Activating…', tone: 'info' });
+          setTimeout(() => {
+            setCampaigns((cs) => cs.map((c) => c.id === newId ? { ...c, status: 'Live', live: true } : c));
+            localStorage.setItem('demo_billbonus_status', 'live');
+            addNotif({ msg: '"Bill Pay Bonus" is now live on MTB Neo.', tone: 'success' });
+            setNotifOpen(true);
+          }, 2500);
+        }, 2500);
+      }
+    };
+
+    // ── Campaign row click: detail for demo, budget modal for others ──
+    const handleSelect = (c) => c.isDemo ? setCampaignDetail(c) : setBudget(c);
+
+    const addNotif = (n) => setNotifs(ns => [...ns, { id: Date.now() + Math.random(), time: 'Just now', read: false, ...n }]);
+    const np = { notifs, setNotifs, notifOpen, setNotifOpen };
+
+    let page;
+    if (active === 'Dashboard') page = <window.Dashboard campaigns={campaigns} onOpenBudget={handleSelect} onCreate={openCreate} />;else
+    if (active === 'Campaigns') page = <window.CampaignsPage campaigns={campaigns} onOpenBudget={handleSelect} onCreate={openCreate} />;else
+    if (active === 'Campaign Builder') page = <window.BuilderPage onBack={() => setActive('Campaigns')} onPublish={publish} />;else
+    if (active === 'Rules Engine') page = <window.RulesEnginePage onCreate={openCreate} />;else
+    if (active === 'STARS Intelligence') page = <window.StarsIntelligencePage onCreate={openCreate} />;
+    else if (active === 'Personalization Engine') page = <window.PersonalizationPage onCreate={openCreate} />;
+    else if (active === 'Tier Management') page = <window.TierManagementPage onCreate={openCreate} />;else
+    if (active === 'Integrations') page = <window.IntegrationsPage onCreate={openCreate} />;else
+    if (active === 'Rewards Catalogue') page = <window.RewardsCataloguePage onCreate={openCreate} />;else
+    if (active === 'Customer Segments') page = <window.CustomerSegmentsPage onCreate={openCreate} />;else
+    if (active === 'Gamification') page = <window.GamificationPage onCreate={openCreate} addNotif={addNotif} setNotifOpen={setNotifOpen} />;
+    else if (active === 'Analytics & Liability') page = <window.AnalyticsPage campaigns={campaigns} onOpenBudget={handleSelect} onCreate={openCreate} />;
+
+    const isBuildPage = active === 'Campaign Builder';
+
+    return (
+      <div className="app">
+      <Sidebar active={active} setActive={setActive} />
+      <div className="main">
+        {!isBuildPage && <Header onCreate={openCreate} {...np} />}
+        {isBuildPage &&
+          <header className="header" style={{ position: 'relative' }}>
+            <div className="search">
+              {Ic('search', { size: 16, sw: 1.8 })}
+              <input placeholder="Search campaigns, segments, rewards…" />
+              <span className="kbd">⌘K</span>
+            </div>
+            <div className="header-right">
+              <span className="demo-pill"><span className="dot"></span>Demo Mode</span>
+              <div style={{ position: 'relative' }}>
+                <button className="icon-btn" onClick={() => setNotifOpen((o) => !o)}>
+                  {notifs.filter((n) => !n.read).length > 0 && <span className="ind"></span>}
+                  {Ic('bell', { size: 18 })}
+                </button>
+                {notifOpen && <NotifPanel notifs={notifs} setNotifs={setNotifs} onClose={() => setNotifOpen(false)} />}
+              </div>
+            </div>
+          </header>
+          }
+        {page}
+      </div>
+      {budget && <window.BudgetModal campaign={budget} onClose={() => setBudget(null)} />}
+      {campaignDetail && <BillPayBonusModal campaign={campaignDetail} onClose={() => setCampaignDetail(null)} />}
+    </div>);
+
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+})();
+</script>
+</body>
+</html>

@@ -609,6 +609,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
 <script type="text/babel" src="console/rewards-catalogue.jsx"></script>
 <script type="text/babel" src="console/segments.jsx"></script>
 <script type="text/babel" src="console/personalization.jsx"></script>
+<script type="text/babel" src="console/stars-intelligence.jsx"></script>
 <script type="text/babel" src="console/tier-management.jsx"></script>
 <script type="text/babel" src="console/rules-engine.jsx"></script>
 <script type="text/babel" src="console/integrations-page.jsx"></script>
@@ -632,7 +633,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
   { group: 'Programs', items: [
     { id: 'Rewards Catalogue', icon: 'rewards' },
     { id: 'Customer Segments', icon: 'segments' },
-    { id: 'Personalization Engine', icon: 'bolt' },
+    { id: 'STARS Intelligence', icon: 'bolt' },
     { id: 'Tier Management', icon: 'star' },
     { id: 'Gamification', icon: 'gamification' },
     { id: 'Analytics & Liability', icon: 'analytics' },
@@ -645,7 +646,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
     const [pass, setPass] = useState('');
     const [err, setErr] = useState('');
     const [loading, setLoading] = useState(false);
-    const email = 'kaiser.jahangir@mutualtrustbank.com';
+    const email = 'kaiser@mutualtrustbank.com';
 
     const handle = (e) => {
       e.preventDefault();
@@ -657,8 +658,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
       <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'grid', placeItems: 'center', padding: 24 }}>
       <div style={{ width: '100%', maxWidth: 380 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 'var(--r-lg)', background: 'var(--accent)', color: '#fff', display: 'grid', placeItems: 'center', fontSize: 22, fontWeight: 800, margin: '0 auto 12px', letterSpacing: '-.02em' }}>∞</div>
-          <img src="uploads/STARS-b7f543df.svg" alt="STARS" style={{ height: 22, width: 'auto', margin: '0 auto', display: 'block' }} />
+          <img src="uploads/STARS-b7f543df.svg" alt="STARS" style={{ height: 26, width: 'auto', margin: '0 auto', display: 'block' }} />
           <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 3 }}>MTB Neo · STARS Loyalty Admin</div>
         </div>
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-xl)', padding: '26px 26px 22px' }}>
@@ -988,7 +988,8 @@ table.tbl { width: 100%; border-collapse: collapse; }
     if (active === 'Campaigns') page = <window.CampaignsPage campaigns={campaigns} onOpenBudget={handleSelect} onCreate={openCreate} />;else
     if (active === 'Campaign Builder') page = <window.BuilderPage onBack={() => setActive('Campaigns')} onPublish={publish} />;else
     if (active === 'Rules Engine') page = <window.RulesEnginePage onCreate={openCreate} />;else
-    if (active === 'Personalization Engine') page = <window.PersonalizationPage onCreate={openCreate} />;
+    if (active === 'STARS Intelligence') page = <window.StarsIntelligencePage onCreate={openCreate} />;
+    else if (active === 'Personalization Engine') page = <window.PersonalizationPage onCreate={openCreate} />;
     else if (active === 'Tier Management') page = <window.TierManagementPage onCreate={openCreate} />;else
     if (active === 'Integrations') page = <window.IntegrationsPage onCreate={openCreate} />;else
     if (active === 'Rewards Catalogue') page = <window.RewardsCataloguePage onCreate={openCreate} />;else
